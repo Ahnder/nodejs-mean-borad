@@ -9,6 +9,7 @@ const app = express();
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
 mongoose.connect(process.env.MONGO_DB);
 let db = mongoose.connection;
 db.once('open', () => {
@@ -27,6 +28,7 @@ app.use(methodOverride('_method'));
 
 // Routes
 app.use('/', require('./routes/home'));
+app.use('/posts', require('./routes/posts'));
 
 // Port setting
 app.listen(3000, () => {
