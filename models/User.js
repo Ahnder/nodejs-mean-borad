@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 // schema
 // required 에 배열을 설정하였다. 첫 번째는 boolean 값이고, 두 번째는 에러메세지이다.
@@ -85,7 +86,14 @@ userSchema.path('password')
                   if (!user.currentPassword) {
                       user.invalidate('currentPassword', "Current Password is required!");
                   }
-                  if (user.currentPassword !== user.originalPassword) {
+                  // bcrypt의 compareSync 함수를 사용해서 저장된 hash와 입력받은 password의 hash가 
+                  // 일치하는지 확인한다.
+                  // compareSync 함수 안에서
+                  // user.currentPassword는 입력받은 text값이고,
+                  // user.originalPassword는 user의 password hash 값이다.
+                  // hash를 해독해서 text를 비교하는 것이 아니라
+                  // text값을 hash로 만들고 그 값이 일치하는지를 확인한다.
+                  if (user.currentPassword && !bcrypt.compareSync(user.currentPassword, user.originalPassword)) {
                       user.invalidate('currentPassword', "Current Password is invalid!");
                   }
                   if (user.newPassword !== user.passwordConfirmation) {
@@ -94,6 +102,35 @@ userSchema.path('password')
               }
 });
 
+// hash password
+// Schema.pre 함수는 첫 번째 parameter로 설정된 event가 일어나기 전(pre)에 먼저 callback함수를 실행시킨다.
+// 'save' event는 Model.create, model.save 함수 실행시 발생하는 event 이다
+// 즉 user를 생성하거나 user를 수정한 뒤 save 함수를 실행할 떄 callback 함수가 먼저 호출 된다.
+userSchema.pre('save', function(next) {
+    let user = this;
+    // isModified함수는 해당 값이 db에 기록된 값과 비교해서 변경된 경우 true를,
+    // 그렇지 않은 경우 false를 return 하는 함수이다.
+    // user 생성 시는 항상 true이며, user 수정 시에는 password가 변경되는 경우에만 true를 리턴한다.
+    // user.password의 변경이 없는 경우라면 이미 해당위치에 hash가 저장되어있으므로 다시 hash를 만들지 않는다.
+    if (!user.isModified('password')) {
+        return next();
+    } else {
+        // user를 생성하거나 user 수정 시 user.password의 변경이 있는 경우에는
+        // bcrypt.hashSync 함수로 password를 hash 값으로 바꾼다.
+        user.password = bcrypt.hashSync(user.password);
+        return next();
+    }
+});
 
+// model methods
+// user model의 password hash와 입력받은 password text를 비교하는 method를 추가한다.
+// 
+userSchema.methods.authenticate = function (password) {
+    let user = this;
+    return bcrypt.compareSync(password, user.password);
+};
+
+
+// model & exports
 let User = mongoose.model('user', userSchema);
 module.exports = User;
