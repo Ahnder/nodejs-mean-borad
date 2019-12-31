@@ -1,5 +1,27 @@
 
+/* global style */
+.buttons form 
+{
+    display: inline-block;
+}
+
+/* home style */
 .home h1
 {
     color: darkseagreen;
+}
+
+/* post style */
+.post h2
+{
+    color: teal;
+    text-align: center;
+}
+.post .post-body
+{
+    white-space: pre-line;
+}
+.post .posts .date
+{
+    width: 100px;
 }
