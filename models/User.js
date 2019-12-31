@@ -14,6 +14,21 @@ let userSchema = mongoose.Schema({
     username: {
         type: String, 
         required: [true, "Username is required!"],
+        // match는 regex(Regular Expression)를 사용해서 문자열을 검사하는 내용이다.
+        // schema 에서 match: [/정규표현식/, "에러메시지"]를 사용하면 
+        // 해당표현식에 맞지 않는 값이 오는 경우 에러메시지를 보낸다.
+        // 1. regex는 / / 안에 작성한다.
+        // 2. ^ 는 문자열의 시작을 나타낸다.
+        // 3. . 는 어떠한 문자열이라도 상관없음을 나타낸다
+        // 4. {숫자1,숫자2} 는 숫자1 이상, 숫자2 이하의 길이를 나타낸다.
+        // 5. $ 는 문자열의 끝을 나타낸다.
+        // 6. ^ 과 $ 가 regex의 시작과 끝에 동시에 있으면 전체 문자열이 조건에 맞아야 한다.
+        // 7. .{4,12} 는 어떠한 문자라도 좋지만 4개 이상 12개 이하여야 한다는 뜻이다.
+        // 8. 즉 전체길이가 4자리 이상 12자리 이하 길이라면 어떠한 문자라도 regex를 통과한다는 의미다.
+        // 9. 이메일 부분의 /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/ 는
+        //    문자열이 이메일의 형식이 맞는지를 확인하는 식이다.
+        match: [/^.{4,12}$/, "Should be 4~12 characters!"],
+        trim: true, // trim은 문자열 앞뒤에 빈칸이 있는 경우 빈칸을 제거해 주는 옵션이다.
         unique: true,
     },
     password: {
@@ -24,9 +39,13 @@ let userSchema = mongoose.Schema({
     name: {
         type: String,
         required: [true, "Name is required!"],
+        match: [/^.{4,12}$/, "Should be 4~12 characters!"],
+        trim: true,
     },
     email: {
         type: String,
+        match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/, "Should be a valid email address!"],
+        trim: true,
     },
 }, { 
     toObject: { virtuals: true }
@@ -55,6 +74,11 @@ userSchema.virtual('newPassword')
 // DB에서 정보를 생성, 수정하기 전에 mongoose가 값이 유효(valid)한지 확인(validate)을 하게 되는데
 // password 항목에 custom validation 함수를 지정할 수 있다.
 // virtual들은 직접 validation이 안되기 때문에 password 에서 값을 확인하도록 한다.
+// regex setting
+// /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/ = 8~16자리 문자열 중에 숫자랑 영문자가 
+// 반드시 하나이상 존재해야 한다는 뜻의 regex다.
+let passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
+let passwordRegexErrorMessage = "Should be minimum 8 characters of alphabet and number combination!"
 userSchema.path('password')
           .validate(function(v) {
               let user = this; // validation callback 함수 속에서 this는 user model 이다.
@@ -70,7 +94,9 @@ userSchema.path('password')
                   if (!user.passwordConfirmation) {
                       user.invalidate('passwordConfirmation', "Password Confirmation is required!");
                   }
-                  if (user.password !== user.passwordConfirmation) {
+                  if (!passwordRegex.test(user.password)) {
+                      user.invalidate('password', passwordRegexErrorMessage);
+                  } else if (user.password !== user.passwordConfirmation) {
                       user.invalidate('passwordConfirmation', "Password Confirmation does not matched!");
                   }
               }
@@ -96,8 +122,10 @@ userSchema.path('password')
                   if (user.currentPassword && !bcrypt.compareSync(user.currentPassword, user.originalPassword)) {
                       user.invalidate('currentPassword', "Current Password is invalid!");
                   }
-                  if (user.newPassword !== user.passwordConfirmation) {
-                      user.invalidate('passwordConfirmation', "password Confirmation does not matched!");
+                  if (user.newPassword && !passwordRegex.test(user.newPassword)) {
+                      user.invalidate('user.newPassword', passwordRegexErrorMessage);
+                  } else if (user.newPassword !== user.passwordConfirmation) {
+                      user.invalidate('passwordConfirmation', "Password Confirmation does not matched!");
                   }
               }
 });
