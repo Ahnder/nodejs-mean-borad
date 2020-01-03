@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('./config/passport');
 
 const app = express();
 
@@ -41,6 +42,28 @@ app.use(flash());
 // 보여져야 하기 때문에 session이 필요하다.
 // 옵션부분의 secret은 hash를 생성하는데 사용되는 값이다.
 app.use(session({ secret: "MySecret", resave: true, saveUninitialized: true }));
+
+
+// Passport
+// passport.initialize() 는 패스포트를 초기화 시켜주는 함수,
+// passport.session() 는 passport를 session과 연결해주는 함수
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Custom Middlewares
+// req.isAuthenticated()는 passport에서 제공하는 함수로, 
+// 현재 로그인이 되어있는지 아닌지를 true 또는 false로 return한다.
+// req.user는 passport에서 추가하는 항목으로 
+// 로그인이 되면 session으로 부터 user를 deserialize하여 생성한다.
+// req.locals에 위 두가지를 담는데, req.locals에 담겨진 변수는 ejs에서 바로 사용가능하다.
+// req.locals.isAuthenticated는 ejs에서 user가 로그인이 되어 있는지 아닌지를 확인하는데 사용되고, 
+// req.locals.currentUser는 로그인된 user의 정보를 불러오는데 사용된다.
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.isAuthenticated();
+    res.locals.currentUser = req.user;
+    next();
+});
+
 
 // Routes
 app.use('/', require('./routes/home'));
