@@ -5,6 +5,9 @@ const Post = require('../models/Post');
 const util = require('../util');
 
 
+// 1. util.isLoggedIn를 사용해서 로그인 된 경우에만 다음 callback 호출
+// 2. checkPermission를 사용해서 본인이 작성한 글에만 다음 callback 호출
+
 // Index
 router.get('/', (req, res) => {
     Post.find({})
@@ -20,14 +23,14 @@ router.get('/', (req, res) => {
 });
 
 // New
-router.get('/new', (req, res) => {
+router.get('/new', util.isLoggedIn, (req, res) => {
     let post = req.flash('post')[0] || {};
     let errors = req.flash('errors')[0] || {};
     res.render('posts/new', { post:post, errors:errors });
 });
 
 // Create
-router.post('/', (req, res) => {
+router.post('/', util.isLoggedIn, (req, res) => {
     // 글을 작성할떄는 req.user._id를 가져와서 post의 author에 기록한다.
     req.body.author = req.user._id;
     Post.create(req.body, (err, post) => {
@@ -51,7 +54,7 @@ router.get('/:id', (req, res) => {
 });
 
 // Edit
-router.get('/:id/edit', (req, res) => {
+router.get('/:id/edit', util.isLoggedIn, checkPermission, (req, res) => {
     let post = req.flash('post')[0];
     let errors = req.flash('errors')[0] || {};
     if (!post) {
@@ -67,7 +70,7 @@ router.get('/:id/edit', (req, res) => {
 });
 
 // Update
-router.put('/:id', (req, res) => {
+router.put('/:id', util.isLoggedIn, checkPermission, (req, res) => {
     req.body.updatedAt = Date.now();  // 데이터의 수정이 있는경우 수정된 날자를 업데이트
     Post.findOneAndUpdate({_id:req.params.id}, req.body, { runValidators: true }, (err, post) => {
         if (err) {
@@ -80,7 +83,7 @@ router.put('/:id', (req, res) => {
 });
 
 // Destroy
-router.delete('/:id', (req, res) => {
+router.delete('/:id', util.isLoggedIn, checkPermission, (req, res) => {
     Post.deleteOne({_id:req.params.id}, err => {
         if (err) return res.json(err);
         res.redirect('/posts');
@@ -89,3 +92,16 @@ router.delete('/:id', (req, res) => {
 
 
 module.exports = router;
+
+
+
+// private functions
+
+// checkPermission 함수는 해당 게시물에 기록된 author와 로그인된 user.id를 비교해서
+// 같은 경우 통과, 만약 다르다면 util.noPermission함수를 호출
+function checkPermission(req, res, next) {
+    Post.findOne({_id:req.params.id}, (err, post) => {
+        if (err) return res.json(err);
+        if (post.author != req.user.id) return util.noPermission(req, res);
+    });
+}

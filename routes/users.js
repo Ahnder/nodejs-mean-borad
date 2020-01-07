@@ -9,7 +9,7 @@ const util = require('../util');
 // sort함수를 넣어주기 위해서 callback 함수없이 괄호가 닫혔다.
 // sort함수에는 {username:1}이 들어가서 username을 기준으로 오름차순으로 정렬한다.(-1일 경우 내림차순)
 // callback 함수가 find 함수 밖으로 나오게 되면, exec(callback)을 사용한다. 
-router.get('/', (req, res) => {
+router.get('/', util.isLoggedIn, (req, res) => {
     User.find({})
         .sort({ username:1 })
         .exec((err, users) => {
@@ -49,7 +49,7 @@ router.post('/', (req, res) => {
 });
 
 // Show
-router.get('/:username', (req, res) => {
+router.get('/:username', util.isLoggedIn, (req, res) => {
     User.findOne({ username:req.params.username }, (err, user) => {
         if (err) return res.json(err);
         res.render('users/show', { user:user });
@@ -65,7 +65,7 @@ router.get('/:username', (req, res) => {
 // render시에 username을 따로 보내주는데, 이전코드에는 user.username이 항상 
 // 해당 user의 username이었지만 이젠 user flash에서 값을 받는 경우 
 // username이 달라 질 수 있기 때문에 주소에서 찾은 username을 따로 보내주게 된다.
-router.get('/:username/edit', (req, res) => {
+router.get('/:username/edit', util.isLoggedIn, checkPermission, (req, res) => {
     let user = req.flash('user')[0];
     let errors = req.flash('errors')[0] || {};
     if (!user) {
@@ -88,7 +88,7 @@ router.get('/:username/edit', (req, res) => {
 // 이때는 항목이름 앞에 '-'를 붙이면 된다.
 // 또한 하나의 select 함수로 여러 항목을 동시에 정할 수 도 있는데 
 // 예를들어 password를 읽어오고, name을 안 읽어오려면 .select('password -name')으로 설정하면 된다.
-router.put('/:username', (req, res, next) => {
+router.put('/:username', util.isLoggedIn, checkPermission, (req, res, next) => {
     User.findOne({ username:req.params.username })
         .select('password')
         .exec((err, user) => {
@@ -145,3 +145,12 @@ module.exports = router;
 //    }
 //   return parsed;
 //}
+
+// checkPermission
+function checkPermission(req, res, next) {
+    User.findOne({ username: req.params.username }, (err, user) => {
+        if (err) return res.json(err);
+        if (user.id != req.user.id) return util.noPermission(req, res);
+        next();
+    });
+}
