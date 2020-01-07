@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const util = require('../util');
 
 // schema
 // Post의 schema는 title, body, createdAt, updatedAt 으로 구성
@@ -20,16 +21,16 @@ let postSchema = mongoose.Schema({
 // formatting 기능(시간을 어떠한 형식으로 보여줄지 정하는 것, 예를들어 17-10-03 or 10-03-17)을
 // 따로 설정해주어야 하기 때문에 아래 코드와 같은 방식으로 설정
 postSchema.virtual('createdDate')
-          .get(function() { return getDate(this.createdAt); });
+          .get(function() { return util.getDate(this.createdAt); });
 
 postSchema.virtual('createdTime')
-          .get(function() { return getTime(this.createdAt); });
+          .get(function() { return util.getTime(this.createdAt); });
 
 postSchema.virtual('updatedDate')
-          .get(function() { return getDate(this.updatedAt); });
+          .get(function() { return util.getDate(this.updatedAt); });
 
 postSchema.virtual('updatedTime')
-          .get(function() { return getTime(this.updatedAt); });
+          .get(function() { return util.getTime(this.updatedAt); });
 
 
 // model & export
@@ -38,20 +39,20 @@ module.exports = Post;
 
 
 // functions
-function getDate(dateObj) {
-    if (dateObj instanceof Date)
-        return dateObj.getFullYear() + "-" + 
-               get2digits(dateObj.getMonth() + 1) + "-" +
-               get2digits(dateObj.getDate());
-}
+//function getDate(dateObj) {
+//    if (dateObj instanceof Date)
+//        return dateObj.getFullYear() + "-" + 
+//               get2digits(dateObj.getMonth() + 1) + "-" +
+//               get2digits(dateObj.getDate());
+//}
 
-function getTime(dateObj) {
-    if (dateObj instanceof Date)
-        return get2digits(dateObj.getHours()) + ":" +
-               get2digits(dateObj.getMinutes()) + ":" +
-               get2digits(dateObj.getSeconds());
-}
+//function getTime(dateObj) {
+//    if (dateObj instanceof Date)
+//        return get2digits(dateObj.getHours()) + ":" +
+//               get2digits(dateObj.getMinutes()) + ":" +
+//               get2digits(dateObj.getSeconds());
+//}
 
-function get2digits(num) {
-    return ("0" + num).slice(-2);
-}
+//function get2digits(num) {
+//    return ("0" + num).slice(-2);
+//}

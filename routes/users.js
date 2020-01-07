@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const util = require('../util');
 
 // Index
 // User.find에는 찾을 조건 ({}=모든 값)이 들어가고, 
@@ -40,7 +41,7 @@ router.post('/', (req, res) => {
     User.create(req.body, (err, user) => {
         if (err) {
             req.flash('user', req.body);
-            req.flash('errors', parseError(err));
+            req.flash('errors', util.parseError(err));
             return res.redirect('/users/new');   
         }
         res.redirect('/users');
@@ -109,7 +110,7 @@ router.put('/:username', (req, res, next) => {
             user.save((err, user) => {
                 if (err) {
                     req.flash('user', req.body);
-                    req.flash('errors', parseError(err));
+                    req.flash('errors', util.parseError(err));
                     return res.redirect('/users/' + req.params.username + '/edit');
                 }
                 res.redirect('/users/' + user.username);
@@ -129,18 +130,18 @@ module.exports = router;
 // else 에서 그 외 error들을 처리한다.
 // 함수시작부분에 console.log("errors: ", errors)를 추가해주면 원래 에러의 형태를 
 // console에서 볼 수 있다.
-function parseError(errors) {
-    console.log("errors: ", errors)
-    let parsed = {};
-    if (errors.name == 'ValidationError') {
-        for (var name in errors.errors) {
-            let validationError = errors.errors[name];
-            parsed[name] = { message:validationError.message };
-        }
-    } else if (errors.code == "11000" && errors.errmsg.indexOf('username') > 0) {
-        parsed.username = { message: "This username already exists!" };
-    } else {
-        parsed.unhandled = JSON.stringify(errors);
-    }
-    return parsed;
-}
+//function parseError(errors) {
+//    console.log("errors: ", errors)
+//    let parsed = {};
+//    if (errors.name == 'ValidationError') {
+//        for (var name in errors.errors) {
+//            let validationError = errors.errors[name];
+//            parsed[name] = { message:validationError.message };
+//        }
+//    } else if (errors.code == "11000" && errors.errmsg.indexOf('username') > 0) {
+//        parsed.username = { message: "This username already exists!" };
+//    } else {
+//        parsed.unhandled = JSON.stringify(errors);
+//    }
+//   return parsed;
+//}
