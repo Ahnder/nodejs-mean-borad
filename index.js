@@ -5,6 +5,8 @@ const methodOverride = require('method-override');
 const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('./config/passport');
+// .env안의 키 가져오기
+require('dotenv').config();
 
 const app = express();
 
@@ -41,7 +43,7 @@ app.use(flash());
 // flash에 저장되는 값 역시 user1이 생성한 flash는 user1에게, user2가 생성한 flash는 user2에게
 // 보여져야 하기 때문에 session이 필요하다.
 // 옵션부분의 secret은 hash를 생성하는데 사용되는 값이다.
-app.use(session({ secret: "MySecret", resave: true, saveUninitialized: true }));
+app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: true }));
 
 
 // Passport

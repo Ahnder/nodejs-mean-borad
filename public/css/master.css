@@ -175,7 +175,7 @@ form label{
     clear: both;
   }
   .user-index ul li{
-    display: inline-block;
+    display: block;
     list-style-type: none;
     float:left;
   }

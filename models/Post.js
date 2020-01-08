@@ -6,11 +6,11 @@ const util = require('../util');
 // default 항목으로 기본 값을 지정할 수 있다. 함수명을 넣으면 해당 함수의 return이 기본값이 된다.
 // Date.now 는 현재 시간을 리턴하는 함수
 let postSchema = mongoose.Schema({
-    title: { type: String, require: true, },
-    body: { type: String, },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true, },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, },
+        title: { type: String, require: true, },
+        body: { type: String, },
+        author: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true, },
+        createdAt: { type: Date, default: Date.now },
+        updatedAt: { type: Date, },
 }, {toObject: { virtuals: true, }}); // virtual들을 object에서 보여주는 mongoose schema의 option
 
 
