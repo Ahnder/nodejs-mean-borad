@@ -47,10 +47,12 @@
             <!-- pagenation -->
             <ul class="pagenation_ul">
                 <% let offset = 3; %>
+                <% let partialQuery; %>
+                <% if (urlQuery) partialQuery = "&"+urlQuery.replace(/page=(.*?)(&|$)/ig,""); %>
                 <% for (var i = 1; i <= maxPage; i++) { %>
                     <% if (i <= offset || i > (maxPage - offset) || (i >= page - (offset - 1)) && i <= page + (offset - 1)) { %>
                         <% if (i != page) { %>
-                            <li>[<a href="/posts?page=<%= i %>"> <%= i %> </a>]</li>
+                            <li>[<a href="/posts?page=<%= i %><%= partialQuery %>"> <%= i %> </a>]</li>
                         <% } else { %>
                             <li>[ <b><%= i %></b> ]</li>
                         <% } %>

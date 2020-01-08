@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
 const util = require('../util');
+const async = require('async');
 
 
 // 1. util.isLoggedIn를 사용해서 로그인 된 경우에만 다음 callback 호출
@@ -10,25 +11,34 @@ const util = require('../util');
 
 // Index
 router.get('/', (req, res) => {
-    let page = Math.max(1, req.query.page);
-    let limit = 1;
-    Post.countDocuments({}, (err, count) => {
-        if (err) return res.json({ message: err });
-        let skip = (page - 1)*limit;
-        let maxPage = Math.ceil(count/limit);
-        Post.find({})
-            // Model.populate() 함수는 relationship이 형성되어 있는 항목의 값을 생성해준다
-            // 현재 post의 author에는 user의 id가 기록되어 있는데,
-            // 이 값을 바탕으로 실제 user의 값을 author에 생성하게 된다.
-            .populate('author')
-            .sort('-createdAt')  // 나중에 생성된 데이터가 위로 오도록 정렬
-            .skip(skip)
-            .limit(limit)
-            .exec((err, posts) => {
-                if(err) return res.json(err);
-                res.render('posts/index', { posts:posts, page:page, maxPage:maxPage });
-        });
-    });
+    let page = (Math.max(1, req.query.page) > 1) ? parseInt(req.query.page) : 1;
+    let limit = (Math.max(1, req.query.limit) > 1) ? parseInt(req.query.limit) : 5;
+
+    async.waterfall([
+        function(callback) {
+            Post.countDocuments({}, (err, count) => {
+                if (err) callback(err);
+                skip = (page - 1)*limit;
+                maxPage = Math.ceil(count/limit);
+                callback(null, skip, maxPage);
+            });        
+        },
+        function(skip, maxPage, callback) {
+            Post.find({})
+                .populate('author')
+                .sort('-createdAt')
+                .skip(skip)
+                .limit(limit)
+                .exec((err, posts) => {
+                    if (err) callback(err);
+                    return res.render('posts/index', {
+                        posts:posts, page:page, maxPage:maxPage, urlQuery:req._parsedUrl.query,
+                    });
+                });
+        }],
+        function(err) {
+            if (err) return res.render({ message: err });
+        }); 
 });
 
 // New
@@ -58,7 +68,7 @@ router.get('/:id', (req, res) => {
         .populate('author')
         .exec((err, post) => {
             if (err) return res.json(err);
-            res.render('posts/show', { post:post, page:req.query.page });
+            res.render('posts/show', { post:post, urlQuery:req._parsedUrl.query, user:req.user });
         });
 });
 
