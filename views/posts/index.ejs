@@ -62,7 +62,28 @@
                 <% } %>                    
             </ul>
             <!-- pagenation end -->
-
+            <!-- search -->
+                <div class="search float_right">
+                    <form class="checkValidation" action="/posts/" id="search">
+                        <select name="searchType">
+                            <% var select %>
+                            <option value="title, body" 
+                                <%= search.searchType=="title, body" ? select="selected" : "" %>>제목 + 본문</option>
+                            <option value="title"
+                                <%= search.searchType=="title" ? select="selected" : "" %>>제목</option>
+                            <option value="body"
+                                <%= search.searchType=="body" ? select="selected" : "" %>>본문</option>
+                                                        
+                        </select>
+                        <input class="cvMinLength" cvMinLength="3"
+                            cvMinLenErrTo='#searchError'
+                            cvMinLenErrMsg="It should be at least 3 characters!"
+                            type="text" name="searchText" value="<%= select ? search.searchText : "" %>">
+                        <button type="submit">검색</button>
+                        <div class="message" id="searchError"></div>    
+                    </form>
+                </div>
+            <!-- search end -->
         </div> <!-- container end -->
 
     </body>

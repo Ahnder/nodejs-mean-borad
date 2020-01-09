@@ -71,6 +71,11 @@ form .form-group{
     float:left;
     margin-right:10px;
 }
+.float_right{
+    float: right;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 .contentBox{
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;

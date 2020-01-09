@@ -13,10 +13,11 @@ const async = require('async');
 router.get('/', (req, res) => {
     let page = (Math.max(1, req.query.page) > 1) ? parseInt(req.query.page) : 1;
     let limit = (Math.max(1, req.query.limit) > 1) ? parseInt(req.query.limit) : 5;
+    let search = createSearch(req.query);
 
     async.waterfall([
         function(callback) {
-            Post.countDocuments({}, (err, count) => {
+            Post.countDocuments(search.findPost, (err, count) => {
                 if (err) callback(err);
                 skip = (page - 1)*limit;
                 maxPage = Math.ceil(count/limit);
@@ -24,7 +25,7 @@ router.get('/', (req, res) => {
             });        
         },
         function(skip, maxPage, callback) {
-            Post.find({})
+            Post.find(search.findPost)
                 .populate('author')
                 .sort('-createdAt')
                 .skip(skip)
@@ -33,6 +34,7 @@ router.get('/', (req, res) => {
                     if (err) callback(err);
                     return res.render('posts/index', {
                         posts:posts, page:page, maxPage:maxPage, urlQuery:req._parsedUrl.query,
+                        search:search,
                     });
                 });
         }],
@@ -122,5 +124,26 @@ function checkPermission(req, res, next) {
     Post.findOne({_id:req.params.id}, (err, post) => {
         if (err) return res.json(err);
         if (post.author != req.user.id) return util.noPermission(req, res);
+        next();
     });
+}
+
+// search 함수
+function createSearch(queries) {
+    let findPost = {};
+    if (queries.searchType && queries.searchText && (queries.searchText.length >= 3)) {
+        let searchTypes = queries.searchType.toLowerCase().split(',');
+        let postQueries = [];
+        if (searchTypes.indexOf('title') >= 0)
+            postQueries.push({ title: { $regex: new RegExp(queries.searchText, 'i') } });
+        if (searchTypes.indexOf('body') >= 0)
+            postQueries.push({ body: { $regex: new RegExp(queries.searchText, 'i') } });
+        if (postQueries.length > 0)
+            findPost = { $or: postQueries };        
+    }
+
+    return { searchType: queries.searchType,
+             searchText: queries.searchText,
+             findPost: findPost};
+            
 }
