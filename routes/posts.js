@@ -1,7 +1,8 @@
 const express = require('express');
-
+const mongoose = require('mongoose');
 const router = express.Router();
 const Post = require('../models/Post');
+const User = require('../models/User');
 const util = require('../util');
 const async = require('async');
 
@@ -17,6 +18,29 @@ router.get('/', (req, res) => {
 
     async.waterfall([
         function(callback) {
+            // search.findUser가 null인 경우 이 함수를 생략, 
+            // null이 아니라면 유저를 찾아서 findPost에 더해준다.
+            if (!search.findUser)
+                return callback(null);
+            User.find(search.findUser, (err, users) => {
+                if (err)
+                    callback(err);
+                let or = [];
+                users.forEach(user => {
+                    or.push({ author: mongoose.Types.ObjectId(user._id) });
+                });
+                if (search.findPost.$or)
+                    search.findPost.$or = search.findPost.$or.concat(or);
+                else if (or.length > 0)
+                    search.findPost = { $or: or };
+                callback(null);            
+            });    
+        },
+        function(callback) {
+            // search.findUser가 존재하지만 search.findPost가 초기값({})인 경우 
+            // 검색결과가 없는 것으로 판단 Post검색을 하지 않는다.
+            if (search.findUser && !search.findPost.$or)
+                return callback(null, null, 0);
             Post.countDocuments(search.findPost, (err, count) => {
                 if (err) callback(err);
                 skip = (page - 1)*limit;
@@ -25,6 +49,10 @@ router.get('/', (req, res) => {
             });        
         },
         function(skip, maxPage, callback) {
+            // search.findUser가 존재하지만 search.findPost가 초기값({})인 경우 
+            // 검색결과가 없는 것으로 판단 Post검색을 하지 않는다.
+            if (search.findUser && !search.findPost.$or)
+                return callback(null, [], 0);
             Post.find(search.findPost)
                 .populate('author')
                 .sort('-createdAt')
@@ -32,14 +60,17 @@ router.get('/', (req, res) => {
                 .limit(limit)
                 .exec((err, posts) => {
                     if (err) callback(err);
-                    return res.render('posts/index', {
-                        posts:posts, page:page, maxPage:maxPage, urlQuery:req._parsedUrl.query,
-                        search:search,
-                    });
+                    callback(null, posts, maxPage);
+                    
                 });
         }],
-        function(err) {
-            if (err) return res.render({ message: err });
+        function(err, posts, maxPage) {
+            if (err) 
+                return res.json({ message: err });
+            return res.render('posts/index', {
+                posts:posts, page:page, maxPage:maxPage, urlQuery:req._parsedUrl.query,
+                search:search,
+            }); 
         }); 
 });
 
@@ -130,7 +161,11 @@ function checkPermission(req, res, next) {
 
 // search 함수
 function createSearch(queries) {
-    let findPost = {};
+    let findPost = {}; 
+    let findUser = null;
+    // 작성자 검색기능 추가 
+    // author - 검색어와 작성자 id의 일부가 일치하는 경우
+    // author! - 검색어와 작성자 id가 완전히 일치하는 경우
     if (queries.searchType && queries.searchText && (queries.searchText.length >= 3)) {
         let searchTypes = queries.searchType.toLowerCase().split(',');
         let postQueries = [];
@@ -138,12 +173,17 @@ function createSearch(queries) {
             postQueries.push({ title: { $regex: new RegExp(queries.searchText, 'i') } });
         if (searchTypes.indexOf('body') >= 0)
             postQueries.push({ body: { $regex: new RegExp(queries.searchText, 'i') } });
+        if (searchTypes.indexOf('author!') >= 0)
+            findUser = { username: queries.searchText };
+        else if (searchTypes.indexOf('author') >= 0)
+            findUser = { username: { $regex: new RegExp(queries.searchText, 'i') } };        
         if (postQueries.length > 0)
             findPost = { $or: postQueries };        
     }
 
     return { searchType: queries.searchType,
              searchText: queries.searchText,
-             findPost: findPost};
+             findPost: findPost,
+             findUser: findUser};
             
 }
