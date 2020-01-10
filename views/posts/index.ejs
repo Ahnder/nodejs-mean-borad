@@ -38,6 +38,7 @@
                                 <a href="/posts/<%= post._id %>">
                                     <div class="ellipsis highlight" data-highlight="<%= search.highlight.title %>" >
                                        <%= post.title %>
+                                       <span class="comments">(<%= post.comments.length %>)</span>
                                     </div>
                                 </a>
                             </td>

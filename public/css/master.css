@@ -28,6 +28,7 @@ form .form-group{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: bold;
 }
 .form-horizontal .control-label {
     padding-top: 5px;
@@ -78,6 +79,7 @@ form .form-group{
 }
 .searchHighligt {
     background-color: yellow;
+    color: red;
 }
 .contentBox{
     border-top: 1px solid #ccc;
@@ -114,7 +116,7 @@ form .form-group{
 }
 .post .post-body {
     white-space: pre-line;
-    padding: 6px 15px 20px;
+    padding: 20px 15px 20px;
 }
 .post .post-info{
     font-size: 11px;
@@ -144,7 +146,7 @@ form .form-group{
 .post .posts th,
 .post .posts td
 {
-    padding: 7px 5px;
+    padding: 12px 5px;
 }
 .post .posts th:first-child,
 .post .posts td:first-child
@@ -168,6 +170,7 @@ form .form-group{
 .post .posts .author{
     text-align: center;
     width: 80px;
+    font-weight: bold;
 }
 .post .posts .date{
     text-align: center;

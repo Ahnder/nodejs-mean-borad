@@ -12,6 +12,18 @@ let postSchema = mongoose.Schema({
         // 조회수(views)와 글번호(numId) 추가
         views: { type: Number, default: 0, },
         numId: { type: Number, required: true, },
+        // 댓글(comments) 추가
+        // NoSQL DB는 배열을 저장할 수 있다.
+        // SQL DB라면 게시글과 댓글은 테이블을 따로 빼서 만들어야 하지만
+        // NoSQL DB는 댓글을 그냥 게시글 데이터에 입력해서 사용가능하다.
+        // 똑같은 게시글-댓글 상황이라도 이 데이터들을 가지고 뭘 할지에 따라서 배열로 넣는것이 
+        // 좋을 수 있고 아닐 수 있는데 이 게시판에서는 어차피 게시글을 읽어올때 
+        // 댓글은 반드시 읽어와야 하는 데이터기 때문에 배열로 만들었다.
+        comments: [{ 
+                body: { type: String, required: true, },
+                author: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true, },
+                createdAt: { type: Date, default: Date.now, },
+         }],
         createdAt: { type: Date, default: Date.now, },
         updatedAt: { type: Date, },
 }, {toObject: { virtuals: true, }}); // virtual들을 object에서 보여주는 mongoose schema의 option

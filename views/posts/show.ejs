@@ -51,6 +51,41 @@
         </div> <!-- row end -->
       </div> <!-- post-container end -->
 
+      <!-- comments -->
+      <div class="comments">
+        <h4>Comments (<%= post.comments ? post.comments.length : "0" %>)</h4>
+        <% if (post.comments) { %>
+          <% post.comments.forEach(function(comment) { %>
+            <div class="comment">
+              <div class="top">
+                <b><%= comment.author.username %></b>
+                ( <%= post.createdDate %>, <%= post.createdTime %> )
+                <% if (user && user.equals(comment.author._id)) { %>
+                  <form class="delete" method="post" 
+                        action="/posts/<%= post._id %>/comments/<%= comment._id %>?_method=delete&<%= urlQuery %>">
+
+                    <input class="button" type="button", value="x"
+                           onclick="confirm('Your comment will be deleted')?this.parentElement.submit():null;">
+                  </form>
+                <% } %>  
+              </div>
+              <div class="body"><%= comment.body %></div>
+            </div>
+          <% }) %>
+        <% } %>
+        
+        <form class="addComment checkValidation"
+              action="/posts/<%= post._id %>/comments?<%= urlQuery %>" method="post">
+        
+          <textarea class="cvRequired" name="comment[body]"
+                    cvRqErrMsg="comments is empty." cvRqErrTo="#cvErrTitle" <%= user ? "" : "disabled" %>
+                    placeholder="<%= user ? 'Add comment here' : 'Please login to make a comment' %>">
+          </textarea>
+          <input class="button" type="submit" value="Comment"<%= user ? "" : "disabled" %>>
+          <div id="cvErrTitle" class="message"></div>    
+        </form>
+      </div>
+
     </div> <!-- container end -->
   </body>
 </html>

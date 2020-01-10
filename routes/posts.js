@@ -79,7 +79,7 @@ router.get('/', (req, res) => {
 router.get('/new', util.isLoggedIn, (req, res) => {
     let post = req.flash('post')[0] || {};
     let errors = req.flash('errors')[0] || {};
-    res.render('posts/new', { post:post, errors:errors });
+    res.render('posts/new', { post:post, errors:errors, urlQuery:req._parsedUrl.query, });
 });
 
 // Create
@@ -125,8 +125,9 @@ router.post('/', util.isLoggedIn, (req, res) => {
 
 // Show
 router.get('/:id', (req, res) => {
-    Post.findById({_id:req.params.id})
-        .populate('author')
+    Post.findById({ _id: req.params.id })
+        // populate에 댓글의 작성자(comments.author)도 추가
+        .populate([{ path: 'author' }, { path: 'comments.author' }])
         .exec((err, post) => {
             if (err) 
                 return res.json(err);
@@ -173,6 +174,32 @@ router.delete('/:id', util.isLoggedIn, checkPermission, (req, res) => {
         if (err) return res.json(err);
         res.redirect('/posts');
     });
+});
+
+// Create Comment
+// 배열의 데이터는 $push, $pull 로 넣거나 뺄 수 있다.
+router.post('/:id/comments', (req, res) => {
+    let newComment = req.body.comment;
+    newComment.author = req.user._id;
+    Post.update({ _id: req.params.id }, 
+                { $push: { comments: newComment } }, 
+                (err, post) => {
+                    if (err)
+                        return res.json({ message: err });
+                    res.redirect('/posts/' + req.params.id + '?' +
+                                 req._parsedUrl.query);    
+                }); 
+});
+// Destroy Comment
+router.delete('/:postId/comments/:commentId', (req, res) => {
+    Post.update({ _id: req.params.postId }, 
+                { $pull: { comments: { _id:req.params.commentId } } },
+                (err, post) => {
+                    if (err)
+                        return res.json({ message: err });
+                    res.redirect('/posts/' + req.params.postId + '?' +
+                                 req._parsedUrl.query.replace(/_method=(.*?)(&|$)/ig,""));    
+                });
 });
 
 
