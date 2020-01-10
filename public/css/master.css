@@ -182,6 +182,18 @@ form .form-group{
     text-align: center;
     width: 60px;
 }
+.show_h3_date{
+    padding-bottom: 5px;
+    font-weight: normal;    
+}
+.show_h3_author{
+    padding-bottom: 5px;
+    font-weight: normal;
+}
+.show_h3 {
+    display: inline-block;
+    width: 10%;
+}
 
 .post-new,
 .post-edit{

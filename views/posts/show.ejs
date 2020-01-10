@@ -21,20 +21,19 @@
 
       <div class="contentBox">
         <h3 class="contentBoxTop">
-          <div><span>Created</span> : <%= post.createdDate %> <%= post.createdTime %></div>
-          <span class="highlight" data-highlight="<%= search.highlight.title %>">
-            <%= post.title %>
-          </span>
-          <div class="highlight" data-highlight="<%= search.highlight.author %>" >
-            <span>Author</span> : <%= post.author ? post.author.username : "" %>
+          <div class="show_h3_date"><span class="show_h3">Date</span> <%= post.createdDate %> <%= post.createdTime %></div class="show_h3_date">
+          <div class="highlight show_h3_author" data-highlight="<%= search.highlight.author %>" >
+            <span class="show_h3">Author</span> <%= post.author ? post.author.username : "" %>
           </div>
+          <div class="highlight" data-highlight="<%= search.highlight.title %>">
+            <span class="show_h3">Title</span> <%= post.title %>
+          </div>
+          
         </h3>
         <div class="row">
           <div class="col-sm-4 col-sm-push-8">
             <div class="post-info">
-              <div class="highlight" data-highlight="<%= search.highlight.author %>" >
-                <span>Author</span> : <%= post.author ? post.author.username : "" %>
-              </div>
+              
               <div>
                 <%= post.views %> views
               </div>
