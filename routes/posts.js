@@ -163,6 +163,9 @@ function checkPermission(req, res, next) {
 function createSearch(queries) {
     let findPost = {}; 
     let findUser = null;
+    // 검색어 하이라이트 추가
+    // search Object를 만들때 highlight를 추가 - highlight.author = queries.searchText;
+    let highlight = {};
     // 작성자 검색기능 추가 
     // author - 검색어와 작성자 id의 일부가 일치하는 경우
     // author! - 검색어와 작성자 id가 완전히 일치하는 경우
@@ -171,12 +174,17 @@ function createSearch(queries) {
         let postQueries = [];
         if (searchTypes.indexOf('title') >= 0)
             postQueries.push({ title: { $regex: new RegExp(queries.searchText, 'i') } });
+            highlight.title = queries.searchText;
         if (searchTypes.indexOf('body') >= 0)
             postQueries.push({ body: { $regex: new RegExp(queries.searchText, 'i') } });
-        if (searchTypes.indexOf('author!') >= 0)
+            highlight.body = queries.searchText;
+        if (searchTypes.indexOf('author!') >= 0) {
             findUser = { username: queries.searchText };
-        else if (searchTypes.indexOf('author') >= 0)
-            findUser = { username: { $regex: new RegExp(queries.searchText, 'i') } };        
+            highlight.author = queries.searchText;
+        } else if (searchTypes.indexOf('author') >= 0) {
+            findUser = { username: { $regex: new RegExp(queries.searchText, 'i') } };
+            highlight.author = queries.searchText;
+        }            
         if (postQueries.length > 0)
             findPost = { $or: postQueries };        
     }
@@ -184,6 +192,7 @@ function createSearch(queries) {
     return { searchType: queries.searchType,
              searchText: queries.searchText,
              findPost: findPost,
-             findUser: findUser};
+             findUser: findUser,
+             highlight: highlight};
             
 }

@@ -26,15 +26,19 @@
                 <tbody>
                     <% if (posts == null || posts.length == 0) { %>
                         <tr>
-                            <td class="noData" colspan="100"> There is no data to show :( </td>
+                            <td class="noData" colspan="3"> There is no data to show :( </td>
                         </tr>
                     <% } %>
                     <% posts.forEach(function(post) { %>
                         <tr>
                             <td class="title">
-                                <a href="/posts/<%= post._id %>"><div class="ellipsis"><%= post.title %></div></a>
+                                <a href="/posts/<%= post._id %>">
+                                    <div class="ellipsis highlight" data-highlight="<%= search.highlight.title %>" >
+                                       <%= post.title %>
+                                    </div>
+                                </a>
                             </td>
-                            <td class="author">
+                            <td class="author highlight" data-highlight="<%= search.highlight.author %>" >
                                 <div class="ellipsis"><%= post.author ? post.author.username : "" %></div>
                             </td>
                             <td class="date">

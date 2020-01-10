@@ -76,6 +76,9 @@ form .form-group{
     margin-top: 10px;
     margin-bottom: 10px;
 }
+.searchHighligt {
+    background-color: yellow;
+}
 .contentBox{
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
