@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Post = require('../models/Post');
 const User = require('../models/User');
+const Counter = require('../models/Counter');
 const util = require('../util');
 const async = require('async');
 
@@ -83,15 +84,42 @@ router.get('/new', util.isLoggedIn, (req, res) => {
 
 // Create
 router.post('/', util.isLoggedIn, (req, res) => {
-    // 글을 작성할떄는 req.user._id를 가져와서 post의 author에 기록한다.
-    req.body.author = req.user._id;
-    Post.create(req.body, (err, post) => {
-        if (err) {
-            req.flash('post', req.body);
-            req.flash('errors', util.parseError(err));
-            return res.redirect('/posts/new');
+    async.waterfall([
+        function(callback) {
+            Counter.findOne({ name: 'posts' }, (err, counter) => {
+                if (err)
+                    callback(err);
+                if (counter) {
+                    callback(null, null, counter);
+                } else {
+                    Counter.create({ name: 'posts', totalCount: 0, }, (err, counter) => {
+                        if (err)
+                            return res.json({ message: err });
+                        callback(null, null, counter);    
+                    });
+                }    
+            });
         }
-        res.redirect('/posts');
+    ],
+    function(err, callback, counter) {
+        if (err) 
+            return res.json({ message: err });
+
+        let newPost = req.body;
+        // 글을 작성할떄는 req.user._id를 가져와서 post의 author에 기록한다.
+        newPost.author = req.user._id;
+        newPost.numId = (counter.totalCount + 1);
+
+        Post.create(req.body, (err, post) => {
+            if (err) {
+                req.flash('post', req.body);
+                req.flash('errors', util.parseError(err));
+                return res.redirect('/posts/new');
+            }
+            counter.totalCount++;
+            counter.save();
+            res.redirect('/posts');
+        });
     });
 });
 
@@ -100,8 +128,13 @@ router.get('/:id', (req, res) => {
     Post.findById({_id:req.params.id})
         .populate('author')
         .exec((err, post) => {
-            if (err) return res.json(err);
-            res.render('posts/show', { post:post, urlQuery:req._parsedUrl.query, user:req.user });
+            if (err) 
+                return res.json(err);
+            post.views++;
+            post.save();
+            res.render('posts/show', { 
+                post:post, urlQuery:req._parsedUrl.query, user:req.user, search: createSearch(req.query), 
+            });
         });
 });
 

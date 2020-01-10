@@ -18,19 +18,22 @@
             <table class="table table-striped posts">
                 <thead>
                     <tr>
+                        <th class="num">Num</th>
                         <th class="title">Title</th>
                         <th class="author">Author</th>
+                        <th class="views">Views</th>
                         <th class="date">Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% if (posts == null || posts.length == 0) { %>
                         <tr>
-                            <td class="noData" colspan="3"> There is no data to show :( </td>
+                            <td class="noData" colspan="5"> There is no data to show :( </td>
                         </tr>
                     <% } %>
                     <% posts.forEach(function(post) { %>
                         <tr>
+                            <td class="num"><%= post.numId %></td>
                             <td class="title">
                                 <a href="/posts/<%= post._id %>">
                                     <div class="ellipsis highlight" data-highlight="<%= search.highlight.title %>" >
@@ -41,6 +44,7 @@
                             <td class="author highlight" data-highlight="<%= search.highlight.author %>" >
                                 <div class="ellipsis"><%= post.author ? post.author.username : "" %></div>
                             </td>
+                            <td class="views"><%= post.views %></td>
                             <td class="date">
                                 <%= post.createdDate %>
                             </td>

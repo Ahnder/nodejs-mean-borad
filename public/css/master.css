@@ -140,6 +140,7 @@ form .form-group{
     border-bottom: 1px solid #ccc;
     table-layout: fixed;
 }
+
 .post .posts th,
 .post .posts td
 {
@@ -155,6 +156,7 @@ form .form-group{
 }
 .post .posts thead tr th{
     border-bottom: 1px solid #ccc;
+    text-align: center;
 }
 .post .posts tbody tr:nth-child(odd){
     background-color: #F4FFFF;
@@ -172,6 +174,15 @@ form .form-group{
     width: 100px;
     padding-right: 15px;
 }
+.post .posts .num{
+    text-align: center;
+    width: 60px;
+}
+.post .posts .views{
+    text-align: center;
+    width: 60px;
+}
+
 .post-new,
 .post-edit{
     max-width: 520px;
