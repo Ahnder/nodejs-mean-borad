@@ -1,5 +1,12 @@
 
 /* global style */
+* {
+    font-family: Noto Sans KR,sans-serif;
+}
+.contenbox {
+    min-height: 550px;
+}
+
 form label{
     padding: 3px;
     margin-bottom: 0;
@@ -100,14 +107,14 @@ form .form-group{
 }
 .home-login{
     max-width: 330px;
-    font-family: 'Open Sans', sans-serif;
+    
     font-size: 12px;
 }
   
   /* post style */
 .post {
-    max-width: 670px;
-    font-family: 'Open Sans', sans-serif;
+    max-width: 800px;
+    
     font-size: 12px;
 }
 .post h2 {
@@ -206,7 +213,7 @@ form .form-group{
   /* user style */
 .user {
     max-width: 320px;
-    font-family: 'Open Sans', sans-serif;
+    
     font-size: 12px;
 }
 .user-index ul{
@@ -237,4 +244,67 @@ form .form-group{
 .user-edit hr{
     margin-top: 5px;
     margin-bottom: 11px;
+}
+
+.post-show .comments{
+    padding-top: 20px;
+    clear: both;
+}
+.post-show .comments h4{
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 3px;
+    margin-bottom: 0;
+}
+.post-show .comments form{
+    display: inline-block;
+    position : relative;
+}
+.post-show .comments .comment {
+    border-bottom: 1px solid #ccc;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.post-show .comments .addComment {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: inline-block;
+    position: relative;
+}
+.post-show .comments .addComment .cvRequired {
+    min-height: 150px;
+    min-width: 770px;
+    max-width: 770px;
+}
+.post-show .comments .addComment .comment_input_btn {
+    float: right;
+}
+
+.footer {
+    clear: both;
+    line-height: 40px;
+    text-align: center;
+    font-size: 25px;
+    color: black;
+    background-color: whitesmoke;
+    border-top: 1px solid #e7e7e7;
+    margin-top: 40px;
+    padding-top: 20px;
+}
+.footer .footer_title {
+    position: relative;
+    display: inline-block;
+    font-size: 1.2em;
+    font-weight: 400;
+}
+.footer .footer_email {
+    background-color: whitesmoke;
+    font-size: 0.6em;
+    font-weight: 300;
+    padding-top: 10px;
+}
+.footer .footer_github {
+    background-color: whitesmoke;
+    font-size: 0.8em;
+    font-weight: 500;
+    padding-bottom: 20px;
 }

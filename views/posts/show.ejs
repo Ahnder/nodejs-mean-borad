@@ -6,7 +6,7 @@
   <body>
     <%- include('../partials/nav') %>
 
-    <div class="container post post-show">
+    <div class="container post post-show contenbox">
       <%- include('./partials/header') %>
 
       <div class="buttons">
@@ -48,10 +48,10 @@
                  data-highlight="<%= search.highlight.body %>" ><%= post.body %>
             </div>
           </div> <!-- col end-->
-        </div> <!-- row end -->
-      </div> <!-- post-container end -->
 
-      <!-- comments -->
+        </div> <!-- row end -->
+
+        <!-- comments -->
       <div class="comments">
         <h4>Comments (<%= post.comments ? post.comments.length : "0" %>)</h4>
         <% if (post.comments) { %>
@@ -78,14 +78,21 @@
               action="/posts/<%= post._id %>/comments?<%= urlQuery %>" method="post">
         
           <textarea class="cvRequired" name="comment[body]"
-                    cvRqErrMsg="comments is empty." cvRqErrTo="#cvErrTitle" <%= user ? "" : "disabled" %>
-                    placeholder="<%= user ? 'Add comment here' : 'Please login to make a comment' %>">
-          </textarea>
-          <input class="button" type="submit" value="Comment"<%= user ? "" : "disabled" %>>
+                    cvRqErrMsg="comments is empty." cvRqErrTo="#cvErrTitle" <%= user ? "" : "disabled" %>></textarea>
+          <input class="button comment_input_btn" type="submit" value="Comment"<%= user ? "" : "disabled" %>>
           <div id="cvErrTitle" class="message"></div>    
         </form>
       </div>
+      <!-- comments end -->
+
+      </div> <!-- post-container end -->
+
+
 
     </div> <!-- container end -->
+
+    <footer>
+      <%- include('../partials/footer') %>
+    </footer>
   </body>
 </html>

@@ -9,6 +9,9 @@ router.get('/', (req, res) => {
 router.get('/about', (req, res) => {
     res.render('home/about');
 });
+router.get('/project', (req, res) => {
+    res.render('home/project');
+});
 
 // Login
 // login view를 보여주는 router

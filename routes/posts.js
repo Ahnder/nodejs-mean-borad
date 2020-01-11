@@ -14,7 +14,7 @@ const async = require('async');
 // Index
 router.get('/', (req, res) => {
     let page = (Math.max(1, req.query.page) > 1) ? parseInt(req.query.page) : 1;
-    let limit = (Math.max(1, req.query.limit) > 1) ? parseInt(req.query.limit) : 5;
+    let limit = (Math.max(1, req.query.limit) > 1) ? parseInt(req.query.limit) : 10;
     let search = createSearch(req.query);
 
     async.waterfall([
@@ -181,7 +181,7 @@ router.delete('/:id', util.isLoggedIn, checkPermission, (req, res) => {
 router.post('/:id/comments', (req, res) => {
     let newComment = req.body.comment;
     newComment.author = req.user._id;
-    Post.update({ _id: req.params.id }, 
+    Post.updateOne({ _id: req.params.id }, 
                 { $push: { comments: newComment } }, 
                 (err, post) => {
                     if (err)
@@ -192,7 +192,7 @@ router.post('/:id/comments', (req, res) => {
 });
 // Destroy Comment
 router.delete('/:postId/comments/:commentId', (req, res) => {
-    Post.update({ _id: req.params.postId }, 
+    Post.updateOne({ _id: req.params.postId }, 
                 { $pull: { comments: { _id:req.params.commentId } } },
                 (err, post) => {
                     if (err)
