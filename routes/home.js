@@ -4,8 +4,9 @@ const passport = require('../config/passport');
 const Post = require('../models/Post');
 const async = require('async');
 
+
 // Home
-// Index 
+// Index
 router.get('/', (req, res) => {
     async.series([
         function(callback) {
@@ -13,9 +14,9 @@ router.get('/', (req, res) => {
                 .populate('author')
                 .sort('-views')
                 .limit(5)
-                .exec((err, posts) => {
+                .exec((err, viewsPosts) => {
                     if (err) return res.json(err);
-                    callback(err, posts);
+                    callback(err, viewsPosts);
                 });
         },
         function(callback) {
@@ -23,9 +24,9 @@ router.get('/', (req, res) => {
                 .populate('author')
                 .sort('-createdAt')
                 .limit(5)
-                .exec((err, posts2) => {
+                .exec((err, createdAtPosts) => {
                     if (err) return res.json(err);
-                    callback(err, posts2);
+                    callback(err, createdAtPosts);
                 });
         }
     ], function(err, results) {
