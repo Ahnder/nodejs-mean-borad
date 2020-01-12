@@ -73,7 +73,7 @@ app.use('/posts', require('./routes/posts'));
 app.use('/users', require('./routes/users'));
 
 // Port setting
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log("Server On! - localhost:" + PORT);
+let port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log("Server On! - localhost:" + port);
 });
