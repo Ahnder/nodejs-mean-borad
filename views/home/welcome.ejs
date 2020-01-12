@@ -6,12 +6,102 @@
     <body>
         <%- include('../partials/nav') %>
 
-        <div class="container home home-welcome contenbox">
+        <div class="container home home-welcome post-index contenbox">
             <div class="jumbotron">
-                <h1>홈페이지</h1>
-                <p>이 사이트는 nodejs-express로 작성되었습니다.</p>
+                <h1>My Website(Nodejs + MongoDB)</h1>
+                <p><a href="/">Home - 메인화면</a></p>
+                <p><a href="/about">About - 사이트 설명</a></p>
+                <p><a href="/project">Project - 진행한 프로젝트</a></p>
+                <p><a href="/posts">게시판 - </a></p>
+                <p><a href="/users/new">Sign Up - 회원가입</a></p>
+                <p><a href="/login">Login - 로그인</a></p>
+                <a href="https://github.com/Ahnder/nodejs-mean-borad" target="_blank">Github : https://github.com/Ahnder/nodejs-mean-borad</a>
             </div>
+
+            <div class="welcome-tables">
+
+            <table class="table posts table-welcome view-sort-posts">
+                <caption>조회수 기준 상위 5개 게시물</caption>
+                <thead>
+                    <tr>
+                        <th class="title">Title</th>
+                        <th class="author">Author</th>
+                        <th class="views">Views</th>
+                        <th class="date">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (viewsPosts == null || viewsPosts.length == 0) { %>
+                        <tr>
+                            <td class="noData" colspan="4"> There is no data to show :( </td>
+                        </tr>
+                    <% } %>
+                    <% viewsPosts.forEach(function(post) { %>
+                        <tr>
+                            <td class="title">
+                                <a href="/posts/<%= post._id %>">
+                                    <div class="table-title-div">
+                                       <span class="ellipsis"><%= post.title %></span>
+                                       <span class="comments">(<%= post.comments.length %>)</span>
+                                    </div>
+                                </a>
+                            </td>
+                            <td class="author">
+                                <div><%= post.author ? post.author.username : "" %></div>
+                            </td>
+                            <td class="views"><%= post.views %></td>
+                            <td class="date">
+                                <%= post.createdDate %>
+                            </td>
+                        </tr>
+                    <% }) %>        
+                </tbody>
+            </table>
+
+            <table class="table posts table-welcome createdat-sort-posts">
+                <caption>최근날짜 기준 상위 5개 게시물</caption>
+                <thead>
+                    <tr>
+                        <th class="title">Title</th>
+                        <th class="author">Author</th>
+                        <th class="views">Views</th>
+                        <th class="date">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (createdAtPosts == null || createdAtPosts.length == 0) { %>
+                        <tr>
+                            <td class="noData" colspan="4"> There is no data to show :( </td>
+                        </tr>
+                    <% } %>
+                    <% createdAtPosts.forEach(function(post) { %>
+                        <tr>
+                            <td class="title">
+                                <a href="/posts/<%= post._id %>">
+                                    <div class="table-title-div">
+                                       <span class="ellipsis"><%= post.title %></span>
+                                       <span class="comments">(<%= post.comments.length %>)</span>
+                                    </div>
+                                </a>
+                            </td>
+                            <td class="author">
+                                <div><%= post.author ? post.author.username : "" %></div>
+                            </td>
+                            <td class="views"><%= post.views %></td>
+                            <td class="date">
+                                <%= post.createdDate %>
+                            </td>
+                        </tr>
+                    <% }) %>        
+                </tbody>
+            </table>
+
+            </div>
+
         </div>
+
+            
+
 
         <footer>
             <%- include('../partials/footer') %>

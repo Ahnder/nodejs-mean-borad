@@ -35,7 +35,6 @@ form .form-group{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: bold;
 }
 .form-horizontal .control-label {
     padding-top: 5px;
@@ -104,11 +103,55 @@ form .form-group{
   /* home style */
 .home h1{
     color: darkseagreen;
+    font-size: 50px;
 }
 .home-login{
     max-width: 330px;
     
     font-size: 12px;
+}
+.welcome-tables {
+    display: inline-block;
+}
+.welcome-tables > table > caption {
+    font-weight: bold;
+    font-size: 25px;
+    color: darkseagreen;
+}
+.table-welcome {
+    max-width: 520px;
+    border-bottom: 1px solid #ddd;
+    float: left;
+    margin-left: 30px;
+}
+.table-welcome > tbody > tr > td {
+    position: relative;
+    vertical-align: middle;
+}
+.table-welcome .author{
+    text-align: center;
+    width: 80px;
+    font-weight: bold;
+}
+.table-welcome .date{
+    text-align: center;
+    width: 100px;
+    padding-right: 15px;
+}
+.table-welcome .views{
+    text-align: center;
+    width: 60px;
+}
+.table-welcome .table-title-div {
+    display: flex;
+}
+.table-welcome .table-title-div .ellipsis {
+    width: auto;
+    min-width: 150px;
+    font-weight: normal;
+}
+.table-welcome .table-title-div .comments {
+    padding-left: 5px;
 }
   
   /* post style */
@@ -118,7 +161,7 @@ form .form-group{
     font-size: 12px;
 }
 .post h2 {
-    color: tomato;
+    color: darkseagreen;
     text-align: center;
 }
 .post .post-body {

@@ -1,11 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('../config/passport');
+const Post = require('../models/Post');
+const async = require('async');
 
 // Home
+// Index 
 router.get('/', (req, res) => {
-    res.render('home/welcome');
+    async.series([
+        function(callback) {
+            Post.find({})
+                .populate('author')
+                .sort('-views')
+                .limit(5)
+                .exec((err, posts) => {
+                    if (err) return res.json(err);
+                    callback(err, posts);
+                });
+        },
+        function(callback) {
+            Post.find({})
+                .populate('author')
+                .sort('-createdAt')
+                .limit(5)
+                .exec((err, posts2) => {
+                    if (err) return res.json(err);
+                    callback(err, posts2);
+                });
+        }
+    ], function(err, results) {
+           if (err) return res.json({ message: err });
+           return res.render('home/welcome', { viewsPosts:results[0], createdAtPosts:results[1] });  
+    });
 });
+
 router.get('/about', (req, res) => {
     res.render('home/about');
 });
@@ -58,5 +86,8 @@ router.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/');
 });
+
+
+
 
 module.exports = router;

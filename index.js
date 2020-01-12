@@ -18,7 +18,7 @@ mongoose.set('useUnifiedTopology', true);
 mongoose.connect(process.env.MONGO_DB);
 let db = mongoose.connection;
 db.once('open', () => {
-    console.log("DB connected");
+    console.log("DB Connected!");
 });
 db.on('error', err => {
     console.log("DB ERROR: ", err);
@@ -73,6 +73,7 @@ app.use('/posts', require('./routes/posts'));
 app.use('/users', require('./routes/users'));
 
 // Port setting
-app.listen(3000, () => {
-    console.log("Server On!");
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log("Server On! - localhost:" + PORT);
 });
