@@ -153,6 +153,16 @@ form .form-group{
 .table-welcome .table-title-div .comments {
     padding-left: 5px;
 }
+@media screen and (max-width: 650px) {
+    .table-welcome {
+        width: 90%;
+    }
+    .welcome-tables .views,
+    .welcome-tables .date {
+        display: none;
+    }
+}
+
   
   /* post style */
 .post {

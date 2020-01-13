@@ -7,31 +7,25 @@ const async = require('async');
 
 // Home
 // Index
+// sortConditionPosts() - 요소로 sort 조건을 받아 posts를 생성 후 콜백함수로 넘겨주는 함수
 router.get('/', (req, res) => {
-    async.series([
+    const views = { 'views': -1 }; // 조회수 내림차 순 (조회수 많은 게시물이 상위)
+    const createdAt = { 'createdAt': -1 }; // 생성된 날짜 내림차 순 (최근 생성된 게시물이 상위)
+    async.parallel([
         function(callback) {
-            Post.find({})
-                .populate('author')
-                .sort('-views')
-                .limit(5)
-                .exec((err, viewsPosts) => {
-                    if (err) return res.json(err);
-                    callback(err, viewsPosts);
-                });
+            sortConditionPosts(views, callback);
         },
         function(callback) {
-            Post.find({})
-                .populate('author')
-                .sort('-createdAt')
-                .limit(5)
-                .exec((err, createdAtPosts) => {
-                    if (err) return res.json(err);
-                    callback(err, createdAtPosts);
-                });
+            sortConditionPosts(createdAt, callback);
         }
-    ], function(err, results) {
+    ], 
+    // 콜백함수
+    // viewsPosts - 조회수 순 게시물 모음
+    // createdAtPosts - 생성날짜 순 게시물 모음
+    function(err, results) {
            if (err) return res.json({ message: err });
-           return res.render('home/welcome', { viewsPosts:results[0], createdAtPosts:results[1] });  
+           return res.render('home/welcome', { viewsPosts: results[0], 
+                                               createdAtPosts: results[1] });  
     });
 });
 
@@ -92,3 +86,19 @@ router.get('/logout', (req, res) => {
 
 
 module.exports = router;
+
+
+// private functions
+
+// sortConditionPosts() - 요소로 sort 조건을 받아 posts를 생성 후 콜백함수로 넘겨주는 함수
+// 공통조건을 추가하거나 변경 또는 삭제 시 posts의 출력형태를 바꿀 수 있다.
+function sortConditionPosts(sortCondition, callback) {
+    Post.find({})
+        .populate('author')
+        .sort(sortCondition)
+        .limit(5)
+        .exec((err, posts) => {
+            if (err) callback(err);
+            callback(null, posts);
+        });
+}
